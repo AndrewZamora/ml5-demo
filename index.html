@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Getting Started with ml5.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+</head>
+
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <button id="trainBtn">Train Model</button>
+    <button id="predictBtn">Predict</button>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const trainBtn = document.getElementById('trainBtn');
+        const predictBtn = document.getElementById('predictBtn');
+        const ctx = canvas.getContext("2d");
+        let targetLabel = 'C';
+        const keyPressed = e => {
+            targetLabel = e.key.toUpperCase();
+        }
+        const drawCircle = e => {
+            const x = e.clientX;
+            const y = e.clientY;
+            const radius = 20;
+            ctx.beginPath();
+            ctx.arc(x,y,radius,0,2* Math.PI,false);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.fillStyle = "black";
+            ctx.font = "20px arial";
+            ctx.fillText(targetLabel, x-6, y+8)
+            ctx.stroke();
+            ctx.closePath();
+
+            let inputs = {
+                x: x,
+                y: y
+            };
+            let target = {
+                label: targetLabel
+            }
+            model.addData(inputs, target);
+        }
+        const whileTraining = (epoch, loss) => {
+            console.log(epoch,loss)
+        }
+        const finishedTraining = () => {
+            console.log('Finished Training')
+        }
+        const train = () => {
+            console.log("Training Started");
+            model.normalizeData();
+            const options = {
+                epochs: 200
+            }
+            model.train(options, whileTraining, finishedTraining);
+        }
+        const predict = () => {
+            
+        }
+        trainBtn.addEventListener('click',train)
+        predictBtn.addEventListener('click',predict)
+        document.addEventListener('keydown',keyPressed)
+        
+        let options = {
+            inputs: ['x', 'y'],
+            outputs: ['label'],
+            task: ['classification'],
+            debug: 'true'
+        };
+        let model = ml5.neuralNetwork();
+        canvas.addEventListener('mousedown', drawCircle );
+
+    </script>
+</body>
+
+</html>
+
+<style>
+    #canvas {
+        border: 3px red dashed;
+    }
+</style>
