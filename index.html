@@ -11,16 +11,25 @@
     <canvas id="canvas" width="400" height="400"></canvas>
     <button id="trainBtn">Train Model</button>
     <script>
-        let model = ml5.neuralNetwork();
+        let options = {
+            inputs: ['x', 'y'],
+            outputs: ['label'],
+            task: 'classification',
+            debug: 'true'
+        };
+        let model = ml5.neuralNetwork(options);
         const canvas = document.getElementById('canvas');
         const trainBtn = document.getElementById('trainBtn');
         const ctx = canvas.getContext("2d");
+        trainBtn.addEventListener('click', train);
+        document.addEventListener('keydown', keyPressed);
+        canvas.addEventListener('mousedown', drawCircle);
         let state = 'collection';
         let targetLabel = 'C';
-        const keyPressed = e => {
+        function keyPressed(e) {
             targetLabel = e.key.toUpperCase();
         }
-        const drawCircle = e => {
+        function drawCircle(e) {
             const x = e.clientX;
             const y = e.clientY;
             let inputs = {
@@ -44,46 +53,34 @@
                 ctx.fillText(targetLabel, x - 6, y + 8)
                 ctx.stroke();
                 ctx.closePath();
-            } else if ( state === 'prediction') {
+            } else if (state === 'prediction') {
                 console.log(inputs)
-                model.predict(inputs, handleResults);
+                model.classify(inputs, handleResults);
             }
         }
-        function handleResults (error, results) {
-            if(error) {
+        function handleResults(error, results) {
+            if (error) {
                 console.error(error);
                 return;
             }
             console.log(results)
         }
-        function whileTraining (epoch, loss) {
+        function whileTraining(epoch, loss) {
             console.log(epoch, loss)
         }
-        const finishedTraining = () => {
+        function finishedTraining() {
             console.log('Finished Training')
             state = 'prediction';
         }
-        function train () {
+        function train() {
             console.log("Training Started");
             state = 'training'
             model.normalizeData();
-            const options = {
+            let options = {
                 epochs: 200
             }
             model.train(options, whileTraining, finishedTraining);
         }
-        trainBtn.addEventListener('click', train)
-        document.addEventListener('keydown', keyPressed)
-
-        let options = {
-            inputs: ['x', 'y'],
-            outputs: ['label'],
-            task: ['classification'],
-            debug: 'true'
-        };
-       
-        canvas.addEventListener('mousedown', drawCircle);
-
     </script>
 </body>
 
