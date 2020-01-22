@@ -23,18 +23,20 @@
         const ctx = canvas.getContext("2d");
         trainBtn.addEventListener('click', train);
         document.addEventListener('keydown', keyPressed);
-        canvas.addEventListener('mousedown', drawCircle);
+        canvas.addEventListener('mousedown', handleMouseInput);
         let state = 'collection';
         let targetLabel = 'C';
+        let currentCoords = {x:"",y: ""}
         function keyPressed(e) {
             targetLabel = e.key.toUpperCase();
         }
-        function drawCircle(e) {
-            const x = e.clientX;
-            const y = e.clientY;
+        function handleMouseInput(e) {
+            currentCoords.x = e.clientX;
+            currentCoords.y = e.clientY;
+            console.log(currentCoords)
             let inputs = {
-                x: x,
-                y: y
+                x: currentCoords.x,
+                y: currentCoords.y
             };
             if (state === 'collection') {
                 let target = {
@@ -42,28 +44,48 @@
                 }
                 console.log(target)
                 model.addData(inputs, target);
-                const radius = 20;
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-                ctx.fillStyle = "white";
-                ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.fillStyle = "black";
-                ctx.font = "20px arial";
-                ctx.fillText(targetLabel, x - 6, y + 8)
-                ctx.stroke();
-                ctx.closePath();
+                const circleOptions = {
+                    radius: 20,
+                    label: targetLabel,
+                    x:  currentCoords.x,
+                    y:  currentCoords.y,
+                    color: 'white'
+                };
+                drawCircle(circleOptions);
             } else if (state === 'prediction') {
                 console.log(inputs)
                 model.classify(inputs, handleResults);
             }
+        }
+        function drawCircle (options) {
+            let {radius, label, x, y, color} = options;
+            console.log(x,y)
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.fillStyle = "black";
+                ctx.font = "20px arial";
+                ctx.fillText(label, x - 6, y + 8)
+                ctx.stroke();
+                ctx.closePath();
         }
         function handleResults(error, results) {
             if (error) {
                 console.error(error);
                 return;
             }
-            console.log(results)
+            console.log("HEYHEYEH",currentCoords)
+            const circleOptions = {
+                    radius: 20,
+                    label: results[0].label,
+                    x: currentCoords.x,
+                    y: currentCoords.y,
+                    color: 'blue'
+                };
+            drawCircle(circleOptions);
+            console.log(results[0].label)
         }
         function whileTraining(epoch, loss) {
             console.log(epoch, loss)
