@@ -9,6 +9,7 @@
 
 <body>
     <canvas id="canvas" width="400" height="400"></canvas>
+    <button id="saveDataBtn">Save Data</button>
     <button id="trainBtn">Train Model</button>
     <script>
         let options = {
@@ -20,7 +21,9 @@
         let model = ml5.neuralNetwork(options);
         const canvas = document.getElementById('canvas');
         const trainBtn = document.getElementById('trainBtn');
+        const saveDataBtn = document.getElementById('saveDataBtn');
         const ctx = canvas.getContext("2d");
+        saveDataBtn.addEventListener('click', saveData);
         trainBtn.addEventListener('click', train);
         document.addEventListener('keydown', keyPressed);
         canvas.addEventListener('mousedown', handleMouseInput);
@@ -76,7 +79,6 @@
                 console.error(error);
                 return;
             }
-            console.log("HEYHEYEH",currentCoords)
             const circleOptions = {
                     radius: 20,
                     label: results[0].label,
@@ -102,6 +104,11 @@
                 epochs: 200
             }
             model.train(options, whileTraining, finishedTraining);
+        }
+        function saveData() {
+            model.saveData('click-data',()=>{
+                console.log('Data Saved')
+            })
         }
     </script>
 </body>
