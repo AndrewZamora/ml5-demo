@@ -19,10 +19,11 @@
             debug: 'true'
         };
         let model = ml5.neuralNetwork(options);
+        model.loadData('./click-data.json');
         const canvas = document.getElementById('canvas');
         const trainBtn = document.getElementById('trainBtn');
         const saveDataBtn = document.getElementById('saveDataBtn');
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d");         
         saveDataBtn.addEventListener('click', saveData);
         trainBtn.addEventListener('click', train);
         document.addEventListener('keydown', keyPressed);
